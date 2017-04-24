@@ -1,4 +1,5 @@
 import re
+import argparse
 
 from bitarray import bitarray
 
@@ -95,12 +96,19 @@ def LSB(bits):
     else:
         return bits[-1]
 
-data = b'ABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZABCDEFGHIJKLMNOPQRSTUVWXYXZ'
+parser = argparse.ArgumentParser(description="Redtooth Packet Generation")
+parser.add_argument('-i', '--input', help='Input data')
+parser.add_argument('-o', '--output', help='Output File')
+args = parser.parse_args()
 
 stream = bitarray(endian='little')
-stream.frombytes(data)
 
-with open('data.bin', 'w') as f:
+with open(args.input, 'r') as f:
+    data = f.readlines()
+    for d in data:
+        stream.frombytes(d.encode())
+
+with open(args.output, 'w') as f:
     while stream.length() > 0:
         data = stream[0:MAX_PAYLOAD_LENGTH]
         packet = Packet(data)
